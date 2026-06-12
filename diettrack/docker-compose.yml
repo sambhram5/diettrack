@@ -1,0 +1,61 @@
+services:
+  # ── PostgreSQL ─────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: diettrack-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: diettrack
+      POSTGRES_USER: diettrack
+      POSTGRES_PASSWORD: diettrack_dev_password
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U diettrack']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ── Backend API ────────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./diettrack-backend
+      dockerfile: Dockerfile
+    container_name: diettrack-api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+      DATABASE_URL: postgresql://diettrack:diettrack_dev_password@postgres:5432/diettrack
+      JWT_ACCESS_SECRET: local-dev-access-secret-change-in-production-64chars-min
+      JWT_REFRESH_SECRET: local-dev-refresh-secret-change-in-production-64chars-min
+      JWT_ACCESS_EXPIRY: 15m
+      JWT_REFRESH_EXPIRY: 7d
+      CORS_ORIGIN: http://localhost:5173
+      BCRYPT_ROUNDS: 10
+
+    ports:
+      - '3001:3001'
+
+  # ── Frontend Dev Server ────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./diettrack-frontend
+      dockerfile: Dockerfile.dev
+    container_name: diettrack-web
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      VITE_API_URL: http://localhost:3001/api
+    ports:
+      - '5173:5173'
+
+volumes:
+  postgres_data:
+    driver: local
