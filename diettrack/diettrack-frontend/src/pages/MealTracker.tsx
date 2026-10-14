@@ -24,7 +24,8 @@ export const MealTracker: React.FC = () => {
   const isToday = date === format(new Date(), 'yyyy-MM-dd');
 
   const changeDate = (dir: number) => {
-    const d = new Date(date); d.setDate(d.getDate() + dir);
+    const d = new Date(date + 'T12:00:00');
+    d.setDate(d.getDate() + dir);
     setDate(format(d, 'yyyy-MM-dd'));
   };
 

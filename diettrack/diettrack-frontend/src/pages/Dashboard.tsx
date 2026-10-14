@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { Flame, Droplets, Scale, Utensils, TrendingUp, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -21,7 +22,7 @@ export const Dashboard: React.FC = () => {
   });
 
   const changeDate = (dir: number) => {
-    const d = new Date(date);
+    const d = new Date(date + 'T12:00:00');
     d.setDate(d.getDate() + dir);
     setDate(format(d, 'yyyy-MM-dd'));
   };
@@ -136,7 +137,7 @@ export const Dashboard: React.FC = () => {
                   <Utensils className="w-4 h-4 inline mr-2" style={{ color: 'var(--brand)' }} />
                   Today's Meals
                 </h2>
-                <a href="/meals" className="text-sm" style={{ color: 'var(--brand)' }}>Log meal →</a>
+                <Link to="/meals" className="text-sm" style={{ color: 'var(--brand)' }}>Log meal →</Link>
               </div>
               {data.meals.length === 0 ? (
                 <EmptyState icon={<Utensils className="w-6 h-6" />} title="No meals logged"

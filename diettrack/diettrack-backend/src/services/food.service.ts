@@ -53,5 +53,10 @@ export const deleteFood = async (foodId: string, userId: string) => {
 
   if (!food) throw new Error('Food not found or unauthorized');
 
+  const usedInMeals = await prisma.mealItem.count({ where: { foodId } });
+  if (usedInMeals > 0) {
+    throw new Error('Cannot delete this food because it is used in logged meals');
+  }
+
   return prisma.food.delete({ where: { id: foodId } });
 };

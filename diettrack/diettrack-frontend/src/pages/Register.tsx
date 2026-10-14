@@ -23,7 +23,7 @@ const GOAL_OPTIONS = [
 
 export const Register: React.FC = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { register } = useAuth();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
@@ -37,15 +37,12 @@ export const Register: React.FC = () => {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const result = await authService.register({
+      await register({
         ...form,
         age: parseInt(form.age),
         height: parseFloat(form.height),
         weight: parseFloat(form.weight),
       });
-      localStorage.setItem('accessToken', result.accessToken);
-      localStorage.setItem('refreshToken', result.refreshToken);
-      await login(form.email, form.password);
       navigate('/dashboard');
       toast.success('Account created! Welcome to DietTrack 🎉');
     } catch (err) {

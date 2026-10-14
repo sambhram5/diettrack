@@ -6,13 +6,10 @@ import { sendSuccess, sendError } from '../utils/response';
 export const getWater = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const date = req.query.date as string | undefined;
-    if (date) {
-      const result = await waterService.getDailyWater(req.user!.userId, date);
-      sendSuccess(res, result);
-    } else {
-      const logs = await waterService.getWaterLogs(req.user!.userId);
-      sendSuccess(res, logs);
-    }
+    const result = date
+      ? await waterService.getDailyWater(req.user!.userId, date)
+      : await waterService.getWaterLogs(req.user!.userId);
+    sendSuccess(res, result);
   } catch (error) {
     next(error);
   }

@@ -22,7 +22,9 @@ const GOAL_ADJUSTMENTS: Record<Goal, number> = {
 
 export const calculateBMR = (age: number, gender: Gender, height: number, weight: number): number => {
   const base = 10 * weight + 6.25 * height - 5 * age;
-  return gender === 'MALE' ? base + 5 : base - 161;
+  if (gender === 'MALE') return base + 5;
+  if (gender === 'FEMALE') return base - 161;
+  return Math.round(base - 78);
 };
 
 export const calculateTDEE = (bmr: number, activityLevel: ActivityLevel): number =>

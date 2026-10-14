@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Search, X, Utensils, Apple } from 'lucide-react';
 import { exportService } from '../../services/export.service';
 import { format, parseISO } from 'date-fns';
@@ -22,6 +23,7 @@ interface GlobalSearchProps {
 }
 
 export const GlobalSearch: React.FC<GlobalSearchProps> = ({ onClose }) => {
+  const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResults | null>(null);
   const [loading, setLoading] = useState(false);
@@ -89,8 +91,9 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ onClose }) => {
           <div className="mb-3">
             <p className="label px-2 mb-2">Foods</p>
             {results.foods.map(food => (
-              <div key={food.id} className="flex items-center justify-between px-3 py-2.5 rounded-xl mb-1"
-                style={{ background: 'var(--surface-3)' }}>
+              <div key={food.id} className="flex items-center justify-between px-3 py-2.5 rounded-xl mb-1 cursor-pointer hover:bg-white/5 transition-colors"
+                style={{ background: 'var(--surface-3)' }}
+                onClick={() => { navigate('/foods'); onClose?.(); }}>
                 <div className="flex items-center gap-2.5">
                   <Apple className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--brand)' }} />
                   <div>
@@ -110,8 +113,9 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ onClose }) => {
           <div>
             <p className="label px-2 mb-2">Meal History</p>
             {results.meals.map(meal => (
-              <div key={meal.id} className="flex items-center justify-between px-3 py-2.5 rounded-xl mb-1"
-                style={{ background: 'var(--surface-3)' }}>
+              <div key={meal.id} className="flex items-center justify-between px-3 py-2.5 rounded-xl mb-1 cursor-pointer hover:bg-white/5 transition-colors"
+                style={{ background: 'var(--surface-3)' }}
+                onClick={() => { navigate('/meals'); onClose?.(); }}>
                 <div className="flex items-center gap-2.5">
                   <Utensils className="w-4 h-4 flex-shrink-0" style={{ color: '#f97316' }} />
                   <div>

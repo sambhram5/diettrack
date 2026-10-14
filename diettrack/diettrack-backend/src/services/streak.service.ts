@@ -4,16 +4,36 @@ type StreakType = 'meal' | 'water' | 'weight';
 
 const isSameDay = (a: Date, b: Date): boolean => {
   return (
-    a.getFullYear() === b.getFullYear() &&
-    a.getMonth() === b.getMonth() &&
-    a.getDate() === b.getDate()
+    a.getUTCFullYear() === b.getUTCFullYear() &&
+    a.getUTCMonth() === b.getUTCMonth() &&
+    a.getUTCDate() === b.getUTCDate()
   );
 };
 
 const isYesterday = (date: Date, today: Date): boolean => {
   const yesterday = new Date(today);
-  yesterday.setDate(yesterday.getDate() - 1);
+  yesterday.setUTCDate(yesterday.getUTCDate() - 1);
   return isSameDay(date, yesterday);
+};
+
+const updateTypeStreak = (
+  lastDate: Date | null,
+  currentStreak: number,
+  logDate: Date
+): { streak: number; lastDate: Date } | null => {
+  if (!lastDate) {
+    return { streak: 1, lastDate: logDate };
+  }
+  if (isSameDay(lastDate, logDate)) {
+    return null;
+  }
+  if (logDate < lastDate) {
+    return null;
+  }
+  if (isYesterday(lastDate, logDate)) {
+    return { streak: currentStreak + 1, lastDate: logDate };
+  }
+  return { streak: 1, lastDate: logDate };
 };
 
 export const updateStreak = async (userId: string, type: StreakType, logDate: Date) => {
@@ -28,31 +48,22 @@ export const updateStreak = async (userId: string, type: StreakType, logDate: Da
   const updates: Record<string, unknown> = {};
 
   if (type === 'meal') {
-    const lastDate = streak.lastMealDate;
-    if (!lastDate || isYesterday(lastDate, logDate)) {
-      updates.mealStreak = streak.mealStreak + 1;
-      updates.lastMealDate = logDate;
-    } else if (!isSameDay(lastDate, logDate)) {
-      updates.mealStreak = 1;
-      updates.lastMealDate = logDate;
+    const res = updateTypeStreak(streak.lastMealDate, streak.mealStreak, logDate);
+    if (res) {
+      updates.mealStreak = res.streak;
+      updates.lastMealDate = res.lastDate;
     }
   } else if (type === 'water') {
-    const lastDate = streak.lastWaterDate;
-    if (!lastDate || isYesterday(lastDate, logDate)) {
-      updates.waterStreak = streak.waterStreak + 1;
-      updates.lastWaterDate = logDate;
-    } else if (!isSameDay(lastDate, logDate)) {
-      updates.waterStreak = 1;
-      updates.lastWaterDate = logDate;
+    const res = updateTypeStreak(streak.lastWaterDate, streak.waterStreak, logDate);
+    if (res) {
+      updates.waterStreak = res.streak;
+      updates.lastWaterDate = res.lastDate;
     }
   } else if (type === 'weight') {
-    const lastDate = streak.lastWeightDate;
-    if (!lastDate || isYesterday(lastDate, logDate)) {
-      updates.weightStreak = streak.weightStreak + 1;
-      updates.lastWeightDate = logDate;
-    } else if (!isSameDay(lastDate, logDate)) {
-      updates.weightStreak = 1;
-      updates.lastWeightDate = logDate;
+    const res = updateTypeStreak(streak.lastWeightDate, streak.weightStreak, logDate);
+    if (res) {
+      updates.weightStreak = res.streak;
+      updates.lastWeightDate = res.lastDate;
     }
   }
 

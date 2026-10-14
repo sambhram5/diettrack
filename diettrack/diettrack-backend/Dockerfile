@@ -28,6 +28,7 @@ RUN npm ci --omit=dev
 
 COPY --from=base /app/dist              ./dist
 COPY --from=base /app/node_modules/.prisma  ./node_modules/.prisma
+COPY --from=base /app/node_modules/@prisma  ./node_modules/@prisma
 COPY --from=base /app/prisma            ./prisma
 
 EXPOSE 3001

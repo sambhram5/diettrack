@@ -52,7 +52,11 @@ export const updateProfile = async (userId: string, input: UpdateProfileInput) =
     recalcTargets = { calorieTarget: t.calories, proteinTarget: t.protein, carbsTarget: t.carbs, fatTarget: t.fat };
   }
 
-  const waterGoal = input.waterGoal ?? (input.weight ? calculateWaterGoal(input.weight) : undefined);
+  const rawWaterGoal = typeof input.waterGoal === 'number' && !isNaN(input.waterGoal) && input.waterGoal > 0
+    ? input.waterGoal
+    : undefined;
+
+  const waterGoal = rawWaterGoal ?? (input.weight ? calculateWaterGoal(input.weight) : undefined);
 
   // Build update object — only Prisma enum fields need `as any`
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

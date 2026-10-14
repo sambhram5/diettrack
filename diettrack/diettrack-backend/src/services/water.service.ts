@@ -7,13 +7,18 @@ export interface CreateWaterInput {
 }
 
 export const getWaterLogs = async (userId: string, date?: string) => {
-  return prisma.waterLog.findMany({
+  const logs = await prisma.waterLog.findMany({
     where: {
       userId,
       ...(date ? { date: new Date(date) } : {}),
     },
     orderBy: { createdAt: 'desc' },
   });
+  const total = (logs as Array<{ amount: number }>).reduce(
+    (sum: number, log: { amount: number }) => sum + log.amount,
+    0
+  );
+  return { logs, total };
 };
 
 export const getDailyWater = async (userId: string, date: string) => {

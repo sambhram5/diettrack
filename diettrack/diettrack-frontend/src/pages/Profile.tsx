@@ -41,12 +41,19 @@ export const Profile: React.FC = () => {
   }, [user]);
 
   const profileMut = useMutation({
-    mutationFn: (data: typeof profileForm) => authService.updateProfile({
-      name: data.name, age: parseInt(data.age), gender: data.gender as Gender,
-      height: parseFloat(data.height), weight: parseFloat(data.weight),
-      activityLevel: data.activityLevel as ActivityLevel, goal: data.goal as Goal,
-      waterGoal: parseInt(data.waterGoal),
-    }),
+    mutationFn: (data: typeof profileForm) => {
+      const parsedWaterGoal = parseInt(data.waterGoal);
+      return authService.updateProfile({
+        name: data.name,
+        age: parseInt(data.age),
+        gender: data.gender as Gender,
+        height: parseFloat(data.height),
+        weight: parseFloat(data.weight),
+        activityLevel: data.activityLevel as ActivityLevel,
+        goal: data.goal as Goal,
+        waterGoal: !isNaN(parsedWaterGoal) && parsedWaterGoal > 0 ? parsedWaterGoal : undefined,
+      });
+    },
     onSuccess: (updated) => {
       updateUser(updated);
       qc.invalidateQueries({ queryKey: ['dashboard'] });

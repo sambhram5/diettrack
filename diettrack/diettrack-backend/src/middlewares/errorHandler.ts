@@ -9,6 +9,10 @@ export const errorHandler = (err: Error, req: Request, res: Response, _next: Nex
     res.status(409).json({ success: false, message: 'A record with this value already exists', field: prismaErr.meta?.target });
     return;
   }
+  if (prismaErr.code === 'P2003') {
+    res.status(409).json({ success: false, message: 'Cannot delete or modify record because it is referenced by other data' });
+    return;
+  }
   if (prismaErr.code === 'P2025') {
     res.status(404).json({ success: false, message: 'Record not found' });
     return;

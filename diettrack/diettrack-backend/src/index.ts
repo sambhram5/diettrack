@@ -19,12 +19,29 @@ import exportRoutes from './routes/export.routes';
 import { errorHandler, notFound } from './middlewares/errorHandler';
 
 const app = express();
+app.set('trust proxy', 1);
 
 // Security
 app.use(helmet());
+
+const allowedOrigins = config.corsOrigin
+  .split(',')
+  .map((origin) => origin.trim().replace(/\/+$/, ''));
+
 app.use(
   cors({
-    origin: config.corsOrigin,
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      const cleanOrigin = origin.replace(/\/+$/, '');
+      if (
+        allowedOrigins.includes('*') ||
+        allowedOrigins.includes(cleanOrigin) ||
+        allowedOrigins.includes(origin)
+      ) {
+        return callback(null, true);
+      }
+      return callback(null, false);
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
