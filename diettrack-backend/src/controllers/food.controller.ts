@@ -42,6 +42,8 @@ export const deleteFood = async (req: AuthRequest, res: Response, next: NextFunc
   } catch (error) {
     if (error instanceof Error && error.message.includes('not found')) {
       sendError(res, error.message, 404);
+    } else if (error instanceof Error && error.message.includes('used in logged meals')) {
+      sendError(res, error.message, 409);
     } else {
       next(error);
     }

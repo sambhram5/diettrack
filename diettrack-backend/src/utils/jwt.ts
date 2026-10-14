@@ -1,9 +1,11 @@
+import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import config from '../config';
 
 export interface TokenPayload {
   userId: string;
   email: string;
+  jti?: string;
 }
 
 export const generateAccessToken = (payload: TokenPayload): string => {
@@ -13,9 +15,13 @@ export const generateAccessToken = (payload: TokenPayload): string => {
 };
 
 export const generateRefreshToken = (payload: TokenPayload): string => {
-  return jwt.sign(payload, config.jwtRefreshSecret, {
-    expiresIn: config.jwtRefreshExpiry,
-  } as jwt.SignOptions);
+  return jwt.sign(
+    { userId: payload.userId, email: payload.email, jti: crypto.randomUUID() },
+    config.jwtRefreshSecret,
+    {
+      expiresIn: config.jwtRefreshExpiry,
+    } as jwt.SignOptions
+  );
 };
 
 export const verifyAccessToken = (token: string): TokenPayload => {
